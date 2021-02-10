@@ -1,0 +1,28 @@
+% Roughly based off of https://github.com/JarcXenon/YuGiOh-Python-Proxies/blob/master/proxies.tex
+\documentclass{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+
+\geometry{
+    paper=a4paper,
+    left=15mm,
+    right=15mm,
+    top=15mm,
+    bottom=15mm
+}
+
+\pagenumbering{gobble}
+
+\newcommand{\card}[1]{
+    \includegraphics[width=59mm, height=86mm]{#1}
+}
+
+\setlength\parindent{0pt}
+
+\begin{document}
+
+    \include{cards}
+
+\end{document}

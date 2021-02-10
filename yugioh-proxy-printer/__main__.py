@@ -6,6 +6,7 @@ import pathlib
 import sys
 import urllib.request
 
+import pdflatex
 import ygoprodeck
 
 
@@ -22,11 +23,30 @@ def main(argv: List[str]) -> None:
     with open(args.ydk_filepath, "r") as input_stream:
         card_ids = parse_ydk_file(input_stream)
 
+    card_images = []
     for card_id in card_ids:
         card_name = get_card_name_by_id(ygo, card_id)
         assert card_name is not None
 
-        print(image_cache.get_image(ygo, card_name))
+        card_image = image_cache.get_image(ygo, card_name)
+        card_images.append(card_image)
+
+    with open("cards.tex", "w") as output_stream:
+        write_cards_tex(output_stream, card_images)
+
+    pdfl = pdflatex.PDFLaTeX.from_texfile("deck.tex")
+    pdf, log, completed_process = pdfl.create_pdf(
+        keep_pdf_file=True, keep_log_file=True
+    )
+
+
+def write_cards_tex(output_stream: IO[str], card_images: List[pathlib.Path]) -> None:
+    for i, path in enumerate(card_images):
+        output_stream.write(f"\\card{{{path}}}\n")
+
+        if i % 3 == 2:
+            # Add in a newline, but with less spacing
+            output_stream.write("\\\\[-2mm]\n")
 
 
 def get_card_name_by_id(ygo: ygoprodeck.YGOPro, card_id: int) -> Optional[str]:
@@ -66,6 +86,7 @@ class ImageCache:
         filepath = self.__get_card_filepath(card_name)
 
         if not filepath.exists():
+            self.cache_path.mkdir(parents=True, exist_ok=True)
             self.__download_image(ygo, card_name, filepath)
             assert filepath.exists()
 

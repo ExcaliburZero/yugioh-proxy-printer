@@ -7,6 +7,7 @@ import sys
 import urllib.request
 
 import pdflatex
+import tqdm
 import ygoprodeck
 
 
@@ -20,11 +21,13 @@ def main(argv: List[str]) -> None:
     ygo = ygoprodeck.YGOPro()
     image_cache = ImageCache(pathlib.Path("images"))
 
+    print("Parsing ydk file:", args.ydk_filepath)
     with open(args.ydk_filepath, "r") as input_stream:
         card_ids = parse_ydk_file(input_stream)
 
+    print("Downloading card images")
     card_images = []
-    for card_id in card_ids:
+    for card_id in tqdm.tqdm(card_ids):
         card_name = get_card_name_by_id(ygo, card_id)
         assert card_name is not None
 
@@ -38,6 +41,8 @@ def main(argv: List[str]) -> None:
     pdf, log, completed_process = pdfl.create_pdf(
         keep_pdf_file=True, keep_log_file=True
     )
+
+    print("Generated deck pdf: deck.tex")
 
 
 def write_cards_tex(output_stream: IO[str], card_images: List[pathlib.Path]) -> None:

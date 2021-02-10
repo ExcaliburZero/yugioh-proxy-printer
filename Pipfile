@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 ygoprodeck = "*"
 pdflatex = "*"
+tqdm = "*"
 
 [dev-packages]
 black = "*"

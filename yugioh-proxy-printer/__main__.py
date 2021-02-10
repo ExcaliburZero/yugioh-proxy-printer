@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import IO, List, Optional
 
+import argparse
 import pathlib
 import sys
 import urllib.request
@@ -8,16 +9,24 @@ import urllib.request
 import ygoprodeck
 
 
-def main(args: List[str]) -> None:
-    print(args)
+def main(argv: List[str]) -> None:
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("ydk_filepath")
+
+    args = parser.parse_args(argv)
 
     ygo = ygoprodeck.YGOPro()
     image_cache = ImageCache(pathlib.Path("images"))
 
-    card_name = get_card_name_by_id(ygo, 49088914)
-    assert card_name is not None
+    with open(args.ydk_filepath, "r") as input_stream:
+        card_ids = parse_ydk_file(input_stream)
 
-    print(image_cache.get_image(ygo, card_name))
+    for card_id in card_ids:
+        card_name = get_card_name_by_id(ygo, card_id)
+        assert card_name is not None
+
+        print(image_cache.get_image(ygo, card_name))
 
 
 def get_card_name_by_id(ygo: ygoprodeck.YGOPro, card_id: int) -> Optional[str]:
@@ -29,6 +38,21 @@ def get_card_name_by_id(ygo: ygoprodeck.YGOPro, card_id: int) -> Optional[str]:
     assert len(matches) == 1
 
     return matches[0]["name"]
+
+
+def parse_ydk_file(input_stream: IO[str]) -> List[int]:
+    # TODO: See if there is an actual spec for this file format
+    card_ids = []
+    for line in input_stream:
+        line = line.split("#")[0]
+        line = line.split("!")[0]
+
+        if len(line) > 0:
+            card_id = int(line)
+
+            card_ids.append(card_id)
+
+    return card_ids
 
 
 @dataclass

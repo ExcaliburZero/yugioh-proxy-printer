@@ -14,7 +14,10 @@ def main(args: List[str]) -> None:
     ygo = ygoprodeck.YGOPro()
     image_cache = ImageCache(pathlib.Path("images"))
 
-    print(image_cache.get_image(ygo, get_card_name_by_id(ygo, 49088914)))
+    card_name = get_card_name_by_id(ygo, 49088914)
+    assert card_name is not None
+
+    print(image_cache.get_image(ygo, card_name))
 
 
 def get_card_name_by_id(ygo: ygoprodeck.YGOPro, card_id: int) -> Optional[str]:
@@ -32,10 +35,10 @@ def get_card_name_by_id(ygo: ygoprodeck.YGOPro, card_id: int) -> Optional[str]:
 class ImageCache:
     cache_path: pathlib.Path
 
-    def __get_card_filepath(self, card_name: str) -> str:
+    def __get_card_filepath(self, card_name: str) -> pathlib.Path:
         return self.cache_path.joinpath(f"{card_name}.jpg")
 
-    def get_image(self, ygo: ygoprodeck.YGOPro, card_name: str) -> str:
+    def get_image(self, ygo: ygoprodeck.YGOPro, card_name: str) -> pathlib.Path:
         filepath = self.__get_card_filepath(card_name)
 
         if not filepath.exists():

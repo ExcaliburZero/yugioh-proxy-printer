@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 import pathlib
 import sys
@@ -14,7 +14,18 @@ def main(args: List[str]) -> None:
     ygo = ygoprodeck.YGOPro()
     image_cache = ImageCache(pathlib.Path("images"))
 
-    print(image_cache.get_image(ygo, "Dark Magician"))
+    print(image_cache.get_image(ygo, get_card_name_by_id(ygo, 49088914)))
+
+
+def get_card_name_by_id(ygo: ygoprodeck.YGOPro, card_id: int) -> Optional[str]:
+    matches = ygo.get_cards(id=card_id)["data"]
+
+    if len(matches) == 0:
+        return None
+
+    assert len(matches) == 1
+
+    return matches[0]["name"]
 
 
 @dataclass

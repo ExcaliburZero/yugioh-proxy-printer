@@ -8,3 +8,8 @@ Downloading card images
 100%|█████████████████████████████████████████████████████████| 55/55 [00:05<00:00, 10.99it/s]
 Generated deck pdf: deck.tex
 ```
+
+## Dependencies
+
+### Ubuntu
+* texlive-latex-extra
